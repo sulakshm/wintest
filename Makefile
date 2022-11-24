@@ -28,7 +28,7 @@ IMAGE_TAG = $(REGISTRY)/$(IMAGENAME):$(IMAGE_VERSION)
 IMAGE_TAG = $(REGISTRY)/$(IMAGENAME):$(IMAGE_VERSION)
 IMAGE_TAG_LATEST = $(REGISTRY)/$(IMAGENAME):latest
 BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-LDFLAGS = -X ${PKG}/main.driverVersion=${IMAGE_VERSION} -X ${PKG}/main.gitCommit=${GIT_COMMIT} -X ${PKG}/main.buildDate=${BUILD_DATE}
+LDFLAGS = -X ${PKG}/cmd/wintest/main.driverVersion=${IMAGE_VERSION} -X ${PKG}/cmd/wintest/main.gitCommit=${GIT_COMMIT} -X ${PKG}/cmd/wintest/main.buildDate=${BUILD_DATE}
 EXT_LDFLAGS = -s -w -extldflags "-static"
 # Generate all combination of all OS, ARCH, and OSVERSIONS for iteration
 ALL_OS = windows
@@ -51,6 +51,6 @@ all: wintest-windows
 
 .PHONY: wintest-windows
 wintest-windows:
-	CGO_ENABLED=0 GOOS=windows go build -a -ldflags "${LDFLAGS} ${EXT_LDFLAGS}" -mod vendor -o _output/${ARCH}/wintest.exe .
+	CGO_ENABLED=0 GOOS=windows go build -a -ldflags "${LDFLAGS} ${EXT_LDFLAGS}" -mod vendor -o _output/${ARCH}/wintest.exe ./cmd/wintest
 
 

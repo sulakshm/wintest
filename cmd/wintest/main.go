@@ -1,13 +1,23 @@
+//go:build windows
+// +build windows
+
 package main
 
 
 import (
 	"fmt"
 	"flag"
+	"strconv"
 
 	"github.com/sulakshm/csi-driver/pkg/mounter"
+	"k8s.io/klog/v2"
 )
 
+var (
+	driverVersion = ""
+	gitCommit = ""
+	buildDate = ""
+)
 /// need targetportal addr, port, iqn, volume id
 
 var (
@@ -18,9 +28,32 @@ var (
 
 	path = flag.String("path", "", "[un]mount volume path")
 	mount = flag.Bool("mount", false, "perform mount")
-	unmount = flag.Bool("unmount", false, "perform mount")
+	unmount = flag.Bool("unmount", false, "perform unmount")
 )
 
+func volHigh(id uint64) uint64 {
+        return id >> 48
+}
+
+func volLow(id uint64) uint64 {
+        return id & 0xffffffffffff
+}
+
+func GetVolumeWWN(volumeID string) (string, error) {
+        // volumeID - pwx unique volume id ex. 425350735095133013
+        const volIDFmt = "504f5258-0000-0002-%04x-%012x"
+
+        id, err := strconv.ParseUint(volumeID, 10, 64)
+        if err != nil {
+                return "", err
+        }
+
+        return fmt.Sprintf(volIDFmt, volHigh(id), volLow(id)), nil
+}
+
+func init() {
+        klog.InitFlags(nil)
+}
 
 func main() {
 	flag.Parse()
@@ -31,11 +64,15 @@ func main() {
 		return
 	}
 
-	px := m.(mounter.csiProxyMounter)
+	px, ok := m.Interface.(mounter.IscsiMounter)
+	if !ok {
+		fmt.Printf("cannot assert to iscsi interface")
+		return
+	}
 
 	// 1. add target portal details
 	fmt.Printf("1. add target portal %s:%d\n", *tpAddr, *tpPort)
-	err = px.IscsiAddTargetPortal(*tpAddr, *tpPort)
+	err = px.IscsiAddTargetPortal(*tpAddr, uint32(*tpPort))
 	if err != nil {
 		fmt.Printf("px.IscsiAddTargetPortal failed %v", err)
 		return
@@ -43,7 +80,7 @@ func main() {
 
 	// 2. connect to the target
 	fmt.Printf("2. iscsi connect iqn %s\n", *nodeAddr)
-	err = px.IscsiConnectTargetNoAuth(*tpAddr, *tpPort, *nodeAddr)
+	err = px.IscsiConnectTargetNoAuth(*tpAddr, uint32(*tpPort), *nodeAddr)
 	if err != nil {
 		fmt.Printf("px.IscsiConnectTargetNoAuth failed %v", err)
 		return
@@ -73,27 +110,27 @@ func main() {
 		}
 	}
 
-	if mount {
+	if *mount {
 		if !exists {
 			fmt.Printf("volume %s does not exist\n", *volumeId)
 			return
 		}
 		fmt.Printf("m1. performing mount action - format volume %v\n", *volumeId)
-		wwn, err := px.GetVolumeWWN(*volumeId)
+		wwn, err := GetVolumeWWN(*volumeId)
 		if err != nil {
 			fmt.Printf("volume %s parse for serial number failed %v", *volumeId, err)
 			return
 		}
 
-		fmt.Printf("volume %s - parsed serial number %s\n", *volumeId, *wwn)
-		err := px.IscsiFormatVolume(wwn, *volumeId)
+		fmt.Printf("volume %s - parsed serial number %s\n", *volumeId, wwn)
+		err = px.IscsiFormatVolume(wwn, *volumeId)
 		if err != nil {
 			fmt.Printf("px.IscsiFormatVolume failed %v", err)
 			return
 		}
 
 		fmt.Printf("m2. performing mount action - mount volume %v to path %v\n", *volumeId, *path)
-		err := px.IscsiVolumeMount(*volumeId, *path)
+		err = px.IscsiVolumeMount(*volumeId, *path)
 		if err != nil {
 			fmt.Printf("px.IscsiVolumeMount failed %v", err)
 			return
@@ -103,10 +140,19 @@ func main() {
 	}
 
 
-	if unmount {
+	if *unmount {
 		fmt.Printf("u1. performing unmount action - volume %v from path %s\n", *volumeId, *path)
+		err := px.IscsiVolumeUnmount(*volumeId, *path)
+		if err != nil {
+			fmt.Printf("px.IscsiVolumeUnmount failed %v", err)
+			return
+		}
 
 		fmt.Printf("u2. disconnect target volume %v, iqn %s\n", *volumeId, *nodeAddr)
-		return
+		err = px.IscsiDisconnectTarget(*nodeAddr)
+		if err != nil {
+			fmt.Printf("px.IscsiDisconnectTarget failed %v", err)
+			return
+		}
 	}
 }
