@@ -28,7 +28,7 @@ IMAGE_TAG = $(REGISTRY)/$(IMAGENAME):$(IMAGE_VERSION)
 IMAGE_TAG = $(REGISTRY)/$(IMAGENAME):$(IMAGE_VERSION)
 IMAGE_TAG_LATEST = $(REGISTRY)/$(IMAGENAME):latest
 BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-LDFLAGS = -X ${PKG}/cmd/wintest/main.driverVersion=${IMAGE_VERSION} -X ${PKG}/cmd/wintest/main.gitCommit=${GIT_COMMIT} -X ${PKG}/cmd/wintest/main.buildDate=${BUILD_DATE}
+LDFLAGS = -X main.driverVersion=${IMAGE_VERSION} -X main.gitCommit=${GIT_COMMIT} -X main.buildDate=${BUILD_DATE}
 EXT_LDFLAGS = -s -w -extldflags "-static"
 # Generate all combination of all OS, ARCH, and OSVERSIONS for iteration
 ALL_OS = windows
