@@ -1,0 +1,132 @@
+PS C:\Users\User\Downloads> .\wintest.exe -v 2 -skip_headers -id 398649739277880943 -iqn iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56 -path /tmp\wintest -tp_addr 10.13.111.120 -tp_port 3260 -unmount
+using ISCSI CSIProxyMounter, API Versions filesystem: v1, SMB: v1
+1. get iscsi disk 398649739277880943
+volume 398649739277880943 - parsed serial number 504f5258-0000-0002-0588-49d36375ce6f
+disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f - not found
+volume 398649739277880943 has no local disk available
+2. get mapped volume 398649739277880943
+
+IscsiVolumeExists found volume with fs label 398649739277880943 - with properties [ ]
+IscsiVolumeExists did not find any volume for label 398649739277880943
+volume 398649739277880943 exists false
+u1. performing unmount action - volume 398649739277880943 from path /tmp\wintest
+IscsiVolumeExists found volume with fs label 398649739277880943 - with properties [ ]
+IscsiVolumeExists did not find any volume for label 398649739277880943 
+u2. disconnect target volume 398649739277880943, iqn iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56
+IscsiDisconnectTarget: target iqn: iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56
+PS C:\Users\User\Downloads> .\wintest.exe -v 2 -skip_headers -id 398649739277880943 -iqn iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56 -path /tmp\wintest -tp_addr 10.13.111.120 -tp_port 3260 -mount
+using ISCSI CSIProxyMounter, API Versions filesystem: v1, SMB: v1
+1. get iscsi disk 398649739277880943
+volume 398649739277880943 - parsed serial number 504f5258-0000-0002-0588-49d36375ce6f
+disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f - not found
+volume 398649739277880943 has no local disk available
+2. get mapped volume 398649739277880943
+IscsiVolumeExists found volume with fs label 398649739277880943 - with properties []
+IscsiVolumeExists did not find any volume for label 398649739277880943
+volume 398649739277880943 exists false
+1. add target portal 10.13.111.120:3260
+IscsiAddTargetPortal: target addr: 10.13.111.120, target port: 3260
+2. iscsi connect iqn iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56
+IscsiConnectTarget: target addr: 10.13.111.120, target port: 3260, iqn: iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56, auth: none
+m1. performing mount action - format volume 398649739277880943
+finding disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f 
+disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f - not found
+finding disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f 
+disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f - not found
+finding disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f
+disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f - not found
+finding disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f
+partitionStyle found disk with serialnumber 504f5258-0000-0002-0588-49d36375ce6f - with partitionstyle GPT
+IscsiVolumeExists found volume with fs label 398649739277880943 - with properties [
+    {
+        "OperationalStatus":  "OK",
+        "HealthStatus":  "Healthy",
+        "FileSystemType":  "NTFS"
+    }
+]
+m2. performing mount action - mount volume 398649739277880943 to path /tmp\wintest
+
+### manually clearing the disk to check format happens during mount
+PS C:\Users\User\Downloads> Get-Volume -FilesystemLabel 398649739277880943 |Get-Partition | Remove-PartitionAccessPath -AccessPath c:\tmp\wintest
+PS C:\Users\User\Downloads> Get-Volume -FilesystemLabel 398649739277880943 |Get-Partition | Get-Disk | Clear-Disk -RemoveData -Confirm:$false
+PS C:\Users\User\Downloads> .\wintest.exe -v 2 -skip_headers -id 398649739277880943 -iqn iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56 -path /tmp\wintest -tp_addr 10.13.111.120 -tp_port 3260 -unmount
+using ISCSI CSIProxyMounter, API Versions filesystem: v1, SMB: v1
+1. get iscsi disk 398649739277880943
+volume 398649739277880943 - parsed serial number 504f5258-0000-0002-0588-49d36375ce6f
+partitionStyle found disk with serialnumber 504f5258-0000-0002-0588-49d36375ce6f - with partitionstyle RAW
+volume 398649739277880943 local disk state false
+2. get mapped volume 398649739277880943
+IscsiVolumeExists found volume with fs label 398649739277880943 - with properties [
+
+]
+IscsiVolumeExists did not find any volume for label 398649739277880943
+volume 398649739277880943 exists false
+u1. performing unmount action - volume 398649739277880943 from path /tmp\wintest
+IscsiVolumeExists found volume with fs label 398649739277880943 - with properties [
+
+]
+IscsiVolumeExists did not find any volume for label 398649739277880943
+u2. disconnect target volume 398649739277880943, iqn iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56
+IscsiDisconnectTarget: target iqn: iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56
+PS C:\Users\User\Downloads> .\wintest.exe -v 2 -skip_headers -id 398649739277880943 -iqn iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56 -path /tmp\wintest -tp_addr 10.13.111.120 -tp_port 3260 -unmount
+using ISCSI CSIProxyMounter, API Versions filesystem: v1, SMB: v1
+1. get iscsi disk 398649739277880943
+volume 398649739277880943 - parsed serial number 504f5258-0000-0002-0588-49d36375ce6f
+disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f - not found
+volume 398649739277880943 has no local disk available
+2. get mapped volume 398649739277880943
+IscsiVolumeExists found volume with fs label 398649739277880943 - with properties [ ]
+IscsiVolumeExists did not find any volume for label 398649739277880943
+volume 398649739277880943 exists false
+u1. performing unmount action - volume 398649739277880943 from path /tmp\wintest 
+IscsiVolumeExists found volume with fs label 398649739277880943 - with properties [ ]
+IscsiVolumeExists did not find any volume for label 398649739277880943
+u2. disconnect target volume 398649739277880943, iqn iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56
+IscsiDisconnectTarget: target iqn: iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56
+PS C:\Users\User\Downloads> .\wintest.exe -v 2 -skip_headers -id 398649739277880943 -iqn iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56 -path /tmp\wintest -tp_addr 10.13.111.120 -tp_port 3260 -mount
+using ISCSI CSIProxyMounter, API Versions filesystem: v1, SMB: v1
+1. get iscsi disk 398649739277880943
+volume 398649739277880943 - parsed serial number 504f5258-0000-0002-0588-49d36375ce6f
+disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f - not found
+volume 398649739277880943 has no local disk available
+2. get mapped volume 398649739277880943
+IscsiVolumeExists found volume with fs label 398649739277880943 - with properties [
+
+]
+IscsiVolumeExists did not find any volume for label 398649739277880943
+volume 398649739277880943 exists false
+1. add target portal 10.13.111.120:3260
+IscsiAddTargetPortal: target addr: 10.13.111.120, target port: 3260
+2. iscsi connect iqn iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56
+IscsiConnectTarget: target addr: 10.13.111.120, target port: 3260, iqn: iqn.2003-01.org.linux-iscsi.ip-10-13-111-243.x8664:sn.caf1b7806a56, auth: none
+m1. performing mount action - format volume 398649739277880943
+finding disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f
+disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f - not found
+finding disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f
+disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f - not found
+finding disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f
+disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f - not found
+finding disk with serialnum 504f5258-0000-0002-0588-49d36375ce6f
+partitionStyle found disk with serialnumber 504f5258-0000-0002-0588-49d36375ce6f - with partitionstyle RAW
+IscsiVolumeExists found volume with fs label 398649739277880943 - with properties [
+
+]
+IscsiVolumeExists did not find any volume for label 398649739277880943
+IscsiVolumeExists found volume with fs label 398649739277880943 - with properties [
+    {
+        "OperationalStatus":  "OK",
+        "HealthStatus":  "Healthy",
+        "FileSystemType":  "NTFS"
+    }
+]
+m2. performing mount action - mount volume 398649739277880943 to path /tmp\wintest
+PS C:\Users\User\Downloads> Get-Volume -FilesystemLabel 398649739277880943 |Get-Partition | Get-Disk                    
+Number Friendly Name Serial Number                    HealthStatus         OperationalStatus      Total Size Partition
+                                                                                                             Style
+------ ------------- -------------                    ------------         -----------------      ---------- ----------
+2      LIO-ORG 39... 504f5258-0000-0002-0588-49d36... Healthy              Online                       1 GB GPT
+
+
+PS C:\Users\User\Downloads>
+
+
