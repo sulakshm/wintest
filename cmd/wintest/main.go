@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/sulakshm/csi-driver/pkg/mounter"
+	"github.com/sulakshm/csi-driver/pkg/common"
 	"k8s.io/klog/v2"
 )
 
@@ -66,7 +67,7 @@ func main() {
 		return
 	}
 
-	m, err := mounter.NewSafeMounter(false)
+	m, err := mounter.NewSafeMounter(common.DriverModeIscsi, false)
 	if err != nil {
 		fmt.Printf("new mounter failed %v", err)
 		return
